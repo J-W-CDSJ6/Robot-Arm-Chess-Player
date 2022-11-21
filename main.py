@@ -26,6 +26,17 @@ class Board:
     }
     return boardedObj
   
+  def setpiece(self, position, piece):
+    # TODO: Finish this function
+    File = ord(position[0])-97
+    Rank = int(position[1])
+    board = self.listedBoard["board"]
+    rankStr = board[8-Rank]
+    listed = list(rankStr)
+    listed[File] = piece
+    rankStr = "".join(listed)
+    newFEN = "{0}/{1}/{2}/{3}/{4}/{5}/{6}/{7} {turn} {castles} {passantable} {half_move} {turn}".format()
+  
   def getpiece(self, position):
     File = ord(position[0])-97
     Rank = int(position[1])
@@ -40,7 +51,15 @@ class Board:
     return expandedRankStr[File]
 
   def move(self, move):
-    pass
+    fromPiece = self.getpiece(move[0:1])
+    match fromPiece.lower():
+      case "1":
+        break
+      case "p":
+        if move[0] == move[2]:
+          # If the pawn wants to move forward
+          if self.getpiece(move[2:3]) == "1":
+            
 
 class Game:
   def __init__(self):
