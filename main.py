@@ -1,3 +1,5 @@
+from stockfish import Stockfish
+
 def main():
   pass
   
