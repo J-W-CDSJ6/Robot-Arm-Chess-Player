@@ -1,8 +1,8 @@
 from stockfish import Stockfish
 
-stockfish_path = "/Users/Guest/Documents/Robot thing/Robot-Arm-Chess-Player-1/stockfish_15_win_x64_avx2/stockfish_15_x64_avx2.exe"
+stockfish_path = "stockfish_15_win_x64_avx2\stockfish_15_x64_avx2.exe"
 
-def replace_piece_name_with_unicdoe_symbol(vis):
+def replace_piece_name_with_unicode_symbol(vis):
   newvis = vis
   newvis = newvis.replace("K", u"♔")
   newvis = newvis.replace("Q", u"♕")
@@ -31,11 +31,26 @@ def make_best_move(instance):
   return move
 
 def main():
-  instance = Stockfish(path=stockfish_path)
+  white = Stockfish(path=stockfish_path, parameters={"Threads": 3, "Hash": 256})
+  black = Stockfish(path=stockfish_path, parameters={"Ponder": "false"})
+  historicalPos = {}
+  drawCounter = 0
+  counter = 0
   while True:
-    vis = replace_piece_name_with_unicdoe_symbol(instance.get_board_visual())
-    print(vis, instance.get_evaluation())
-    if make_best_move(instance) is None: break
+    instance = white if counter % 2 == 0 else black
+    vis = replace_piece_name_with_unicode_symbol(instance.get_board_visual())
+    print(vis, ("White" if counter % 2 == 0 else "Black") + " eval: ", instance.get_evaluation()["value"])
+    if counter % 2 == 0:
+      if make_best_move(instance) is None: break
+    else:
+      if make_best_move_with_time_constraint(instance, 1) is None: break
+    if not (instance.get_fen_position() in historicalPos): historicalPos[instance.get_fen_position()] = 0
+    historicalPos[instance.get_fen_position()] += 1
+    if instance.get_evaluation()["value"] == 0: drawCounter += 1
+    else: drawCounter = 0
+    if drawCounter == 100: break
+    (black if counter % 2 == 0 else white).set_fen_position(instance.get_fen_position())
+    counter += 1
   print("gg")
   
 if __name__ == "__main__":
